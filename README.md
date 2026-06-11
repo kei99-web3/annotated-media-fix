@@ -136,3 +136,8 @@ MIT.
 
 If you review from a phone, use the copy action and paste the JSON into your AI chat. Do not try to make the agent browse the phone filesystem.
 
+
+## Tip: PC Review
+
+For desktop review, saving the JSON file is more reliable than clipboard state. The finder script searches common local save locations and validates the schema before the agent edits anything.
+
