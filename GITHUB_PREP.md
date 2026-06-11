@@ -1,9 +1,9 @@
-# GitHub Prep
+﻿# GitHub Prep
 
 ## Repository
 
 - Suggested name: `annotated-media-fix`
-- Visibility at launch: public, only after explicit user approval
+- Visibility at launch: public, approved and published on 2026-06-11
 - License: MIT
 - Primary language: Python
 - Demo assets: synthetic only
@@ -58,4 +58,4 @@ It works well for images, video frames, slides, banners, and UI screenshots.
 PC flow: save JSON locally.
 Mobile flow: copy JSON into chat.
 
-Repo: TODO
+Repo: https://github.com/kei99-web3/annotated-media-fix
