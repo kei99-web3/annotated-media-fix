@@ -131,3 +131,8 @@ This repository is intentionally small. It does not include hosted accounts, ima
 ## License
 
 MIT.
+
+## Tip: Mobile Review
+
+If you review from a phone, use the copy action and paste the JSON into your AI chat. Do not try to make the agent browse the phone filesystem.
+
