@@ -1,0 +1,50 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; width: 1600px; height: 900px; font-family: Arial, "Yu Gothic", sans-serif; background: #eef4ff; color: #0f172a; }
+  .canvas { width: 1600px; height: 900px; padding: 64px; display: grid; grid-template-columns: 1fr 520px; gap: 46px; align-items: center; }
+  .left { display: grid; gap: 28px; }
+  .eyebrow { display: inline-flex; width: max-content; padding: 10px 16px; border-radius: 7px; background: #1d4ed8; color: white; font-weight: 800; font-size: 28px; }
+  h1 { margin: 0; font-size: 78px; line-height: 1.02; letter-spacing: 0; }
+  .sub { margin: 0; color: #475569; font-size: 34px; line-height: 1.35; max-width: 920px; }
+  .chips { display: flex; gap: 16px; flex-wrap: wrap; }
+  .chip { padding: 14px 18px; border-radius: 7px; background: #ffffff; border: 2px solid #d5def0; font-size: 25px; font-weight: 700; }
+  .panel { background: white; border: 2px solid #d5def0; border-radius: 8px; padding: 22px; box-shadow: 0 18px 50px rgba(15, 23, 42, .14); }
+  .panel h2 { margin: 0 0 14px; font-size: 30px; }
+  .mock { position: relative; height: 410px; border: 2px solid #d5def0; border-radius: 8px; background: #f8fafc; overflow: hidden; }
+  .mark { position: absolute; border: 7px solid #f59e0b; border-radius: 50%; width: 360px; height: 135px; left: 56px; top: 72px; transform: rotate(-8deg); }
+  .arrow { position: absolute; width: 150px; height: 7px; background: #ef4444; left: 260px; top: 250px; transform: rotate(-25deg); transform-origin: left center; }
+  .arrow:after { content: ""; position: absolute; right: -2px; top: -12px; border-left: 28px solid #ef4444; border-top: 16px solid transparent; border-bottom: 16px solid transparent; }
+  .note { position: absolute; left: 54px; bottom: 42px; width: 360px; background: #111827; color: white; border-radius: 8px; padding: 18px; font-size: 23px; line-height: 1.25; }
+  .code { margin-top: 14px; background: #0f172a; color: #bfdbfe; border-radius: 8px; padding: 16px; font-family: Consolas, monospace; font-size: 18px; line-height: 1.25; }
+  .footer { position: absolute; left: 64px; bottom: 46px; color: #475569; font-size: 24px; font-weight: 700; }
+</style>
+</head>
+<body>
+  <main class="canvas">
+    <section class="left">
+      <div class="eyebrow">OPEN SOURCE</div>
+      <h1>Mark the image.<br>Let AI fix the source.</h1>
+      <p class="sub">Annotated Media Fix turns visual feedback on images, video frames, slides, and UI screenshots into AI-readable correction JSON.</p>
+      <div class="chips">
+        <div class="chip">Local-first</div>
+        <div class="chip">PC save / mobile copy</div>
+        <div class="chip">Before-after evidence</div>
+      </div>
+    </section>
+    <section class="panel">
+      <h2>Visual feedback → fix brief</h2>
+      <div class="mock">
+        <div class="mark"></div>
+        <div class="arrow"></div>
+        <div class="note">“Center this text and make the empty area feel better.”</div>
+      </div>
+      <div class="code">{ "schema": "annotated-media-fix/v1", "annotations": [...] }</div>
+    </section>
+  </main>
+  <div class="footer">github.com/kei99-web3/annotated-media-fix</div>
+</body>
+</html>

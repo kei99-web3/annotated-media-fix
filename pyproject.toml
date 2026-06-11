@@ -1,0 +1,23 @@
+[project]
+name = "annotated-media-fix"
+version = "0.1.0"
+description = "Local-first review canvas for turning visual feedback into AI-readable fix JSON."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Kei" }]
+keywords = ["ai", "annotation", "visual-feedback", "design-review", "local-first"]
+
+[project.urls]
+Homepage = "https://github.com/kei99-web3/annotated-media-fix"
+Repository = "https://github.com/kei99-web3/annotated-media-fix"
+Issues = "https://github.com/kei99-web3/annotated-media-fix/issues"
+
+[project.scripts]
+annotated-media-build = "annotated_media_fix.build_review_canvas:main"
+annotated-media-find = "annotated_media_fix.find_latest_annotations:main"
+annotated-media-validate = "annotated_media_fix.validate_annotation_bundle:main"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"

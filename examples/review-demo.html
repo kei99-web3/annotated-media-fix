@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Markup Notes</title>
+  <style>
+    :root { color-scheme: light; --ink:#101318; --muted:#5b6472; --line:#d9dde5; --bg:#f6f7f9; --panel:#ffffff; --accent:#d92d20; --soft:#fff3f0; --danger:#b42318; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Arial, "Yu Gothic", "Meiryo", sans-serif; color: var(--ink); background: var(--bg); }
+    header, .toolbar, .side { background: var(--panel); border-bottom: 1px solid var(--line); }
+    header { padding: 14px 18px; display: flex; gap: 12px; align-items: baseline; justify-content: space-between; }
+    h1 { font-size: 19px; margin: 0; }
+    .meta { color: var(--muted); font-size: 13px; }
+    main { display: grid; grid-template-columns: minmax(0, 1fr) 380px; min-height: calc(100vh - 58px); }
+    .stage-wrap { padding: 16px; overflow: auto; }
+    .stage { position: relative; width: min(100%, 1280px); margin: 0 auto; background: #111; border: 1px solid var(--line); }
+    .media { display: block; width: 100%; height: auto; max-height: calc(100vh - 120px); object-fit: contain; background: #111; }
+    canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: crosshair; touch-action: none; }
+    .side { border-left: 1px solid var(--line); border-bottom: 0; padding: 16px; overflow: auto; }
+    .panel-title { margin: 0 0 6px; font-size: 16px; }
+    .helper { color: var(--muted); font-size: 13px; margin: 0 0 14px; }
+    .section { border-top: 1px solid var(--line); padding-top: 14px; margin-top: 14px; }
+    .section:first-of-type { border-top: 0; padding-top: 0; margin-top: 0; }
+    .section-title { display: block; color: var(--muted); font-size: 12px; font-weight: 700; margin-bottom: 8px; text-transform: uppercase; }
+    .toolbar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0; margin: 0 0 10px; border-bottom: 0; }
+    button, select, input, textarea { font: inherit; }
+    button { min-height: 42px; border: 1px solid var(--line); background: #fff; border-radius: 7px; padding: 8px 10px; cursor: pointer; }
+    button.active { border-color: var(--accent); color: var(--accent); background: var(--soft); font-weight: 700; }
+    .utility-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .secondary { color: var(--ink); }
+    .danger { color: var(--danger); border-color: #f2b8b5; }
+    .primary { width: 100%; color: #fff; background: #1f2937; border-color: #1f2937; font-weight: 700; }
+    .export-actions { display: grid; gap: 8px; }
+    .status { min-height: 20px; color: var(--muted); font-size: 13px; }
+    .lang-toggle { display: inline-flex; gap: 0; align-items: center; border: 1px solid var(--line); border-radius: 7px; overflow: hidden; background: #fff; }
+    .lang-toggle button { min-height: 32px; min-width: 42px; padding: 4px 8px; border: 0; border-radius: 0; font-size: 12px; font-weight: 700; }
+    .lang-toggle button + button { border-left: 1px solid var(--line); }
+    textarea { width: 100%; min-height: 74px; resize: vertical; border: 1px solid var(--line); border-radius: 6px; padding: 8px; }
+    textarea:focus, button:focus-visible { outline: 3px solid #93c5fd; outline-offset: 2px; }
+    .row { display: grid; gap: 6px; margin-bottom: 12px; }
+    .annotation { border: 1px solid var(--line); border-radius: 8px; padding: 10px; margin-bottom: 10px; background: #fff; }
+    .annotation-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+    .annotation strong { font-size: 13px; }
+    .annotation-actions button { min-height: 34px; padding: 5px 9px; font-size: 13px; }
+    .annotation textarea { min-height: 60px; font-size: 14px; }
+    .empty { color: var(--muted); font-size: 14px; padding: 10px 0; }
+    .sr-json { display: none; }
+    @media (max-width: 920px) { main { grid-template-columns: 1fr; } .side { border-left: 0; border-top: 1px solid var(--line); } }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1 id="app-title">Markup Notes</h1>
+      <div id="app-meta" class="meta">Mark an area first, then write the note for that mark.</div>
+    </div>
+    <div class="lang-toggle" aria-label="Language">
+      <button id="lang-en" class="active" type="button">EN</button>
+      <button id="lang-ja" type="button">JP</button>
+    </div>
+  </header>
+  <main>
+    <section class="stage-wrap">
+      <div id="stage" class="stage">
+        <img id="media" class="media" src="demo-banner.svg" alt="Review target">
+        <canvas id="canvas"></canvas>
+      </div>
+    </section>
+    <aside class="side">
+      <h2 id="panel-title" class="panel-title">Choose a mark tool</h2>
+      <p id="helper" class="helper">1. Choose a tool  2. Mark the image  3. Write the note that appears below</p>
+
+      <section class="section">
+        <span id="tools-title" class="section-title">Tools</span>
+        <div class="toolbar">
+          <button id="rect" class="active" type="button">Area</button>
+          <button id="arrow" type="button">Arrow</button>
+          <button id="pen" type="button">Pen</button>
+        </div>
+        <div class="utility-row">
+          <button id="undo" class="secondary" type="button">Undo last</button>
+          <button id="clear" class="danger" type="button">Clear all</button>
+        </div>
+      </section>
+
+      <section class="section">
+        <span id="notes-title" class="section-title">Notes</span>
+        <div id="list"></div>
+      </section>
+
+      <section class="section">
+        <div class="export-actions">
+          <button id="download" class="primary" type="button">Save file (PC)</button>
+          <button id="copy" class="secondary" type="button">Copy notes (mobile)</button>
+          <div id="status" class="status" role="status" aria-live="polite"></div>
+        </div>
+      </section>
+      <textarea id="json" class="sr-json" aria-hidden="true">{"schema": "annotated-media-fix/v1", "media_type": "image", "media": {"src": "demo-banner.svg", "timestamp": null}, "annotations": []}</textarea>
+    </aside>
+  </main>
+  <script>
+    const initialPayload = {"schema": "annotated-media-fix/v1", "media_type": "image", "media": {"src": "demo-banner.svg", "timestamp": null}, "annotations": []};
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const stage = document.getElementById('stage');
+    const jsonOut = document.getElementById('json');
+    const list = document.getElementById('list');
+    const payload = initialPayload;
+    const uiText = {
+      en: {
+        appTitle: 'Markup Notes',
+        appMeta: 'Mark an area first, then write the note for that mark.',
+        panelTitle: 'Choose a mark tool',
+        helper: '1. Choose a tool  2. Mark the image  3. Write the note that appears below',
+        toolsTitle: 'Tools',
+        notesTitle: 'Notes',
+        rect: 'Area',
+        arrow: 'Arrow',
+        pen: 'Pen',
+        undo: 'Undo last',
+        clear: 'Clear all',
+        copy: 'Copy notes (mobile)',
+        download: 'Save file (PC)',
+        copied: 'Copied. Paste it into the Codex chat.',
+        copyFailed: 'Copy failed. Use Save file instead.',
+        downloaded: 'Downloaded to this device.',
+        empty: 'No notes yet. Mark the image to add one.',
+        delete: 'Delete',
+        notePlaceholder: 'Write the correction note for this mark.'
+      },
+      ja: {
+        appTitle: '赤入れメモ',
+        appMeta: '先に範囲を指定してから、その場所のメモを書きます。',
+        panelTitle: '道具を選ぶ',
+        helper: '1. 道具を選ぶ  2. 画像に印をつける  3. 下に出たメモ欄へ書く',
+        toolsTitle: '道具',
+        notesTitle: 'メモ',
+        rect: '領域選択',
+        arrow: '矢印',
+        pen: 'ペン',
+        undo: '1つ戻す',
+        clear: '全消し',
+        copy: 'スマホ用コピー',
+        download: 'PCに保存',
+        copied: 'コピーしました。Codexのチャットに貼れます。',
+        copyFailed: 'コピーできませんでした。PCに保存を使ってください。',
+        downloaded: 'この端末に保存しました。',
+        empty: 'まだメモはありません。画像に印をつけると追加されます。',
+        delete: '削除',
+        notePlaceholder: 'この場所の修正メモを書く'
+      }
+    };
+    let language = 'en';
+    let tool = 'rect';
+    let drawing = false;
+    let start = null;
+    let currentPath = [];
+
+    function resize() {
+      const r = stage.getBoundingClientRect();
+      canvas.width = Math.round(r.width);
+      canvas.height = Math.round(r.height);
+      drawAll();
+    }
+
+    function pos(event) {
+      const r = canvas.getBoundingClientRect();
+      return { x: Math.round(event.clientX - r.left), y: Math.round(event.clientY - r.top) };
+    }
+
+    function setTool(next) {
+      tool = next;
+      for (const id of ['rect', 'arrow', 'pen']) document.getElementById(id).classList.toggle('active', id === tool);
+    }
+
+    function nextId() { return 'a' + String(payload.annotations.length + 1).padStart(2, '0'); }
+
+    function addAnnotation(item) {
+      item.id = nextId();
+      item.note = '';
+      item.color = '#ff3b30';
+      payload.annotations.push(item);
+      drawAll();
+      renderList();
+      renderJson();
+      focusAnnotation(item.id);
+    }
+
+    function renumberAnnotations() {
+      payload.annotations.forEach((item, index) => {
+        item.id = 'a' + String(index + 1).padStart(2, '0');
+      });
+    }
+
+    function drawAll() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = '#ff3b30';
+      ctx.fillStyle = '#ff3b30';
+      ctx.font = '14px Arial';
+      for (const a of payload.annotations) {
+        ctx.beginPath();
+        if (a.type === 'rect') ctx.rect(a.x, a.y, a.w, a.h);
+        if (a.type === 'arrow') {
+          ctx.moveTo(a.x1, a.y1); ctx.lineTo(a.x2, a.y2);
+          const angle = Math.atan2(a.y2 - a.y1, a.x2 - a.x1);
+          for (const d of [0.75, -0.75]) {
+            ctx.moveTo(a.x2, a.y2);
+            ctx.lineTo(a.x2 - 18 * Math.cos(angle + d), a.y2 - 18 * Math.sin(angle + d));
+          }
+        }
+        if (a.type === 'pen') {
+          a.points.forEach((p, i) => i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y));
+        }
+        ctx.stroke();
+        ctx.fillText(a.id, (a.x || a.x1 || (a.points && a.points[0].x) || 8) + 6, (a.y || a.y1 || (a.points && a.points[0].y) || 18) + 16);
+      }
+    }
+
+    function renderList() {
+      list.innerHTML = '';
+      if (!payload.annotations.length) {
+        const empty = document.createElement('div');
+        empty.className = 'empty';
+        empty.textContent = uiText[language].empty;
+        list.appendChild(empty);
+        return;
+      }
+      for (const a of payload.annotations) {
+        const card = document.createElement('div');
+        card.className = 'annotation';
+        card.dataset.id = a.id;
+
+        const head = document.createElement('div');
+        head.className = 'annotation-head';
+        const title = document.createElement('strong');
+        title.textContent = `${a.id} · ${toolName(a.type)}`;
+        const actions = document.createElement('div');
+        actions.className = 'annotation-actions';
+        const del = document.createElement('button');
+        del.type = 'button';
+        del.dataset.action = 'delete';
+        del.className = 'danger';
+        del.textContent = uiText[language].delete;
+        actions.append(del);
+        head.append(title, actions);
+
+        const edit = document.createElement('textarea');
+        edit.dataset.role = 'note';
+        edit.value = a.note || '';
+        edit.placeholder = uiText[language].notePlaceholder;
+
+        card.append(head, edit);
+        list.appendChild(card);
+      }
+    }
+
+    function toolName(type) {
+      return { rect: uiText[language].rect, arrow: uiText[language].arrow, pen: uiText[language].pen }[type] || type;
+    }
+
+    function focusAnnotation(id) {
+      const card = list.querySelector(`[data-id="${id}"]`);
+      const field = card && card.querySelector('[data-role="note"]');
+      if (field) field.focus();
+    }
+
+    function applyLanguage(next) {
+      language = next;
+      document.documentElement.lang = next;
+      document.title = uiText[next].appTitle;
+      document.getElementById('app-title').textContent = uiText[next].appTitle;
+      document.getElementById('app-meta').textContent = uiText[next].appMeta;
+      document.getElementById('panel-title').textContent = uiText[next].panelTitle;
+      document.getElementById('helper').textContent = uiText[next].helper;
+      document.getElementById('tools-title').textContent = uiText[next].toolsTitle;
+      document.getElementById('notes-title').textContent = uiText[next].notesTitle;
+      document.getElementById('rect').textContent = uiText[next].rect;
+      document.getElementById('arrow').textContent = uiText[next].arrow;
+      document.getElementById('pen').textContent = uiText[next].pen;
+      document.getElementById('undo').textContent = uiText[next].undo;
+      document.getElementById('clear').textContent = uiText[next].clear;
+      document.getElementById('copy').textContent = uiText[next].copy;
+      document.getElementById('download').textContent = uiText[next].download;
+      document.getElementById('status').textContent = '';
+      document.getElementById('lang-en').classList.toggle('active', next === 'en');
+      document.getElementById('lang-ja').classList.toggle('active', next === 'ja');
+      renderList();
+    }
+
+    function renderJson() {
+      payload.media.width = canvas.width;
+      payload.media.height = canvas.height;
+      jsonOut.value = JSON.stringify(payload, null, 2);
+    }
+
+    function saveCard(card) {
+      const item = payload.annotations.find(a => a.id === card.dataset.id);
+      if (!item) return;
+      item.note = card.querySelector('[data-role="note"]').value.trim();
+      renderJson();
+    }
+
+    function deleteCard(card) {
+      const index = payload.annotations.findIndex(a => a.id === card.dataset.id);
+      if (index === -1) return;
+      payload.annotations.splice(index, 1);
+      renumberAnnotations();
+      drawAll();
+      renderList();
+      renderJson();
+    }
+
+    canvas.addEventListener('pointerdown', (event) => {
+      drawing = true;
+      start = pos(event);
+      currentPath = [start];
+      canvas.setPointerCapture(event.pointerId);
+    });
+    canvas.addEventListener('pointermove', (event) => {
+      if (!drawing) return;
+      const p = pos(event);
+      if (tool === 'pen') currentPath.push(p);
+      drawAll();
+      ctx.setLineDash([8, 6]);
+      ctx.beginPath();
+      if (tool === 'rect') ctx.rect(start.x, start.y, p.x - start.x, p.y - start.y);
+      if (tool === 'arrow') { ctx.moveTo(start.x, start.y); ctx.lineTo(p.x, p.y); }
+      if (tool === 'pen') currentPath.forEach((q, i) => i ? ctx.lineTo(q.x, q.y) : ctx.moveTo(q.x, q.y));
+      ctx.stroke();
+      ctx.setLineDash([]);
+    });
+    canvas.addEventListener('pointerup', (event) => {
+      if (!drawing) return;
+      drawing = false;
+      const p = pos(event);
+      if (tool === 'rect') addAnnotation({ type: 'rect', x: start.x, y: start.y, w: p.x - start.x, h: p.y - start.y });
+      if (tool === 'arrow') addAnnotation({ type: 'arrow', x1: start.x, y1: start.y, x2: p.x, y2: p.y });
+      if (tool === 'pen') addAnnotation({ type: 'pen', points: currentPath });
+    });
+
+    document.getElementById('rect').onclick = () => setTool('rect');
+    document.getElementById('arrow').onclick = () => setTool('arrow');
+    document.getElementById('pen').onclick = () => setTool('pen');
+    document.getElementById('lang-en').onclick = () => applyLanguage('en');
+    document.getElementById('lang-ja').onclick = () => applyLanguage('ja');
+    document.getElementById('undo').onclick = () => { payload.annotations.pop(); renumberAnnotations(); drawAll(); renderList(); renderJson(); };
+    document.getElementById('clear').onclick = () => { payload.annotations.length = 0; drawAll(); renderList(); renderJson(); };
+    list.addEventListener('input', (event) => {
+      const card = event.target.closest('.annotation');
+      if (card && event.target.dataset.role === 'note') saveCard(card);
+    });
+    list.addEventListener('click', (event) => {
+      const button = event.target.closest('button');
+      const card = event.target.closest('.annotation');
+      if (!button || !card) return;
+      if (button.dataset.action === 'delete') deleteCard(card);
+    });
+    document.getElementById('copy').onclick = async () => {
+      renderJson();
+      try {
+        await navigator.clipboard.writeText(jsonOut.value);
+        document.getElementById('status').textContent = uiText[language].copied;
+      } catch {
+        document.getElementById('status').textContent = uiText[language].copyFailed;
+      }
+    };
+    document.getElementById('download').onclick = () => {
+      renderJson();
+      const blob = new Blob([jsonOut.value], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'annotations.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      document.getElementById('status').textContent = uiText[language].downloaded;
+    };
+    window.addEventListener('resize', resize);
+    resize();
+    applyLanguage('en');
+  </script>
+</body>
+</html>
